@@ -1,0 +1,253 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:		nox
+# Required-Start:	$network $local_fs $remote_fs
+# Required-Stop:
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description:	NOX
+### END INIT INFO
+
+# /etc/init.d/nox: start and stop the NOX daemon
+
+DESC="Network Control Platform"
+NAME="noxcore"
+EXT_NAME="noxext"
+
+NOX_HOME="/opt/nox"
+NOX_DAEMON="$NOX_HOME/bin/nox_core"
+NOX_DPCTL="$NOX_HOME/bin/dpctl"
+NOX_DPCTL_PROBE_CMD=
+NOX_CONF="$NOX_HOME/etc/nox/nox.xml"
+NOX_PIDFILE="/var/run/$NAME.pid"
+NOX_USER="root:root"
+NOX_EXTRA_START=
+NOX_CORE_LIMIT=
+
+SCRIPTNAME="/etc/init.d/$NAME"
+
+# Read the configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+# Read the extension configuration variable file if it is present
+[ -r /etc/default/$EXT_NAME ] && . /etc/default/$EXT_NAME
+
+NOX_ARGS="--daemon --conf=$NOX_CONF --pid=$NOX_PIDFILE $NOX_ARGS $NOX_EXT_ARGS"
+
+# Load the VERBOSE setting and other rcS variables
+[ -f /etc/default/rcS ] && . /etc/default/rcS
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+. /lib/lsb/init-functions
+
+# Exit if the application is not installed
+[ -x $NOX_DAEMON ] || exit 0
+( $NOX_DAEMON -V 2>&1 | grep -q NOX ) 2>/dev/null || exit 0
+
+# Exit if the probe is enabled, but the probe tool not installed
+if [ -n "$NOX_DPCTL_PROBE_CMD" ] && [ ! -x $NOX_DPCTL ]; then
+    exit 0
+fi
+
+do_start()
+{
+    # Return
+    #   0 if daemon has been started
+    #   1 if daemon was already running
+    #   2 if daemon could not be started
+    start-stop-daemon --start --quiet --pidfile $NOX_PIDFILE \
+	--chdir $NOX_HOME/bin --startas $NOX_DAEMON --test > \
+	/dev/null || return 1
+
+    # If defined, execute the extra start step
+    if [ -n "$NOX_EXTRA_START" ]; then
+	$NOX_EXTRA_START
+	[ $? -ne 0 ] && return 2
+    fi
+    
+    if test -n "$NOX_CORE_LIMIT"; then
+        echo "Setting core limit to $NOX_CORE_LIMIT"
+        ulimit -c "$NOX_CORE_LIMIT" || true
+    fi
+    if test -n "$NOX_FD_LIMIT"; then
+        echo "Setting file descriptor limit to $NOX_CORE_LIMIT"
+        ulimit -n "$NOX_FD_LIMIT" || true
+    fi
+
+    start-stop-daemon --start --quiet --pidfile $NOX_PIDFILE \
+	--chdir $NOX_HOME/bin --chuid $NOX_USER --startas \
+	$NOX_DAEMON -- $NOX_ARGS || return 2
+
+    return 0
+}
+
+do_stop()
+{
+    # Return
+    #   0 if daemon has been stopped
+    #   1 if daemon was already stopped
+    #   2 if daemon could not be stopped
+    #   other if a failure occurred
+    start-stop-daemon --stop --quiet --retry=TERM/10/KILL/5 --pidfile \
+	$NOX_PIDFILE
+    return "$?"
+}
+
+monitor_nox()
+{
+    [ -z "$NOX_DPCTL_PROBE_CMD" ] && return 2
+
+    $NOX_DPCTL $NOX_DPCTL_PROBE_CMD 2>/dev/null
+    return "$?"
+}
+
+wait_start()
+{
+    # Return
+    #  	0 if daemon has been started
+    #	1 if daemon didn't start even after extensive waiting
+    TRIES=0
+    while :
+    do
+	monitor_nox
+	case "$?" in
+	    0|2) 
+		break
+		;;
+	    *)
+		TRIES=`expr $TRIES + 1`
+		sleep 1
+		
+		[ $TRIES = 30 ] && return 1
+		;;
+	esac
+    done
+
+    return 0
+}
+
+case "$1" in
+    start)
+	# Return
+	#   0 if daemon has been started or it was already running
+	#   2 if daemon could not be started
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+	do_start
+	case "$?" in
+	    0|1)
+		wait_start
+		RETVAL="$?"
+		[ "$RETVAL" != 0 ] && RETVAL=2
+
+		[ "$VERBOSE" != no ] && log_end_msg $RETVAL
+		exit $RETVAL
+		;;
+	    2)
+		[ "$VERBOSE" != no ] && log_end_msg 1
+		exit 2
+		;;
+	esac
+	;;
+
+    stop)
+	# Return
+	#   0 if daemon has been stopped or was already stopped
+	#   2 if daemon could not be stopped
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	do_stop
+	case "$?" in
+	    0|1)
+		[ "$VERBOSE" != no ] && log_end_msg 0
+		exit 0
+		;;
+	    2)
+		[ "$VERBOSE" != no ] && log_end_msg 1
+		exit 1
+		;;
+	esac
+	;;
+
+    restart|force-reload)
+	# Return
+	#   0 if daemon has been restarted or it was restarted
+	#   2 if daemon could not be started
+	[ "$VERBOSE" != no ] && log_daemon_msg "Restarting $DESC" "$NAME"
+	do_stop
+	case "$?" in
+	    0|1)
+		do_start
+		case "$?" in
+		    0)
+			wait_start
+			RETVAL="$?"
+			[ "$RETVAL" != 0 ] && RETVAL=2
+
+			log_end_msg $RETVAL
+			exit $RETVAL
+			;;
+		    1)
+			log_end_msg 1 # Old process is still running
+			exit 1
+			;;
+		    *)
+			log_end_msg 1 # Failed to start
+			exit 1
+			;;
+		esac
+		;;
+	    *)
+		log_end_msg 1 # Failed to stop
+		exit 1
+		;;
+	esac
+	;;
+
+    status)
+	# Return
+	#   0 if daemon is running or service is OK
+	#   1 if daemon is dead and /var/run pid file exists
+	#   3 if daemon is not running
+	#   4 if daemon status is unknown
+	echo -n "Status of $DESC: "
+
+	if [ ! -r "$NOX_PIDFILE" ]; then
+	    monitor_nox
+	    case "$?" in
+		0)
+		    echo "$NAME status is unknown."
+		    exit 4
+		    ;;
+		*)
+		    echo "$NAME is not running."
+		    exit 3
+		    ;;
+	    esac
+	fi
+
+	if read pid < "$NOX_PIDFILE" && ps -p "$pid" > /dev/null 2>&1; then
+	    monitor_nox 
+	    case "$?" in
+		0|2)
+		    echo "$NAME is running."
+		    exit 0
+		    ;;
+		*)
+		    echo "$NAME status is unknown."
+		    exit 4
+		    ;;
+	    esac
+	else
+	    echo "$NAME is not running but $NOX_PIDFILE exists."
+	    exit 1
+	fi
+	;;
+
+    *)
+	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload|status}" >&2
+	exit 3
+	;;
+esac
+
+:

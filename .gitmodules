@@ -1,0 +1,3 @@
+[submodule "src/third-party/hostap"]
+	path = src/third-party/hostap
+	url = nicira.dyndns.org:/srv/git/hostap

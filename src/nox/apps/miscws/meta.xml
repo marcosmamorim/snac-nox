@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components:components xmlns:components="http://www.noxrepo.org/components.xsd">
+
+  <component>
+    <name>cpustats</name>
+    <python>nox.apps.miscws.cpustats</python>
+  </component>
+
+  <component>
+    <name>noxinfows</name>
+    <dependency><name>cpustats</name></dependency>
+    <dependency><name>coreui</name></dependency>
+    <dependency><name>webservice</name></dependency> 
+    <dependency><name>configuration</name></dependency>
+    <dependency><name>pycswitchstats</name></dependency>
+    <python>nox.apps.miscws.noxinfows</python>
+  </component>
+  
+</components:components>

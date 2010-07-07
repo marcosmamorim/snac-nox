@@ -1,0 +1,28 @@
+Source: nox
+Section: net
+Priority: extra
+Maintainer: NOX team <nox@noxrepo.org>
+Build-Depends: debhelper (>= 7), autoconf (>= 2.60), automake (>= 1.10), libssl-dev, pkg-config (>= 0.21), po-debconf, bzip2, openssl, libboost-test-dev, libboost-filesystem-dev, libboost-filesystem-dev, libxerces-c2-dev, python2.5-dev, python-openssl, libsqlite3-dev, swig, libboost-thread-dev, python-sphinx, libldap2-dev, sun-java6-jre
+Standards-Version: 3.7.3
+Homepage: http://www.noxrepo.org
+
+Package: noxcore
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-filesystem1.34.1, libboost-serialization1.34.1, libxerces-c28, python2.5, python-twisted, python-simplejson, python-mako, openflow-pki, python-openssl
+Suggests: corekeeper, nox-monitor
+Description: NOX network control platform 
+    NOX network control platform and applications
+
+Package: nox-monitor
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, psmisc, noxcore 
+Suggests: corekeeper
+Description: NOX monitor utility 
+    NOX monitor utility 
+
+Package: nox-dbg
+Architecture: any
+Description: Debug symbols for NOX packages
+ This package contains the debug symbols for all the NOX packages.  Install
+ it to debug one of them or to examine a core dump produced by one of them.
+

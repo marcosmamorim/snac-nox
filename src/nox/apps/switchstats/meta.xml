@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components:components xmlns:components="http://www.noxrepo.org/components.xsd">
+  <component>
+    <name>cswitchstats</name>
+    <library>cswitchstats</library>
+  </component>
+  <!-- Python component -->
+  <component>
+    <name>pycswitchstats</name>
+    <dependency>
+      <name>cswitchstats</name>
+    </dependency>
+    <python>nox.apps.switchstats.pycswitchstats</python>
+  </component>  
+  <component>
+    <name>switchstats</name>
+    <dependency>
+      <name>netinfo_mod_event</name>
+    </dependency>
+    <dependency>
+      <name>directorymanager</name>
+    </dependency>
+    <dependency>
+      <name>pybindings_storage</name>
+    </dependency>
+    <dependency>
+      <name>pycswitchstats</name>
+    </dependency>
+    <python>nox.apps.switchstats.switchstats</python>
+  </component>
+</components:components>

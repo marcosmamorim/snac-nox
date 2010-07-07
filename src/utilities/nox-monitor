@@ -1,0 +1,93 @@
+#!/bin/sh
+# Copyright (c) 2008 Nicira Networks
+
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+NOXCORE_PID=/var/run/noxcore.pid
+LOG_FILE=/var/log/nox/monitor
+INTERVAL=1
+FAIL_THRESH=5
+
+usage() {
+    echo usage: $0 options
+    echo
+    echo "OPTIONS:"
+    echo "  -h   Show this message"
+    echo "  -p   PID file for noxcore (default: $NOXCORE_PID)"
+    echo "  -l   File to log messages (default: $LOG_FILE)"
+    echo "  -c   Number of consecutive failures before stopping monitor (default: $FAIL_THRESH)"
+}
+
+log() {
+    echo `date +"%b %d %X"`:$1 
+    echo `date +"%b %d %X"`:$1 >> $LOG_FILE
+}
+
+
+while getopts "hp:s:l:i:c:" OPTION; do
+    case $OPTION in
+        h)
+            usage
+            exit 1
+            ;;
+
+        p) 
+            NOXCORE_PID=$OPTARG
+            ;;
+
+        l) 
+            LOG_FILE=$OPTARG
+            ;;
+
+        i) 
+            INTERVAL=$OPTARG
+            ;;
+
+        c) 
+            FAIL_THRESH=$OPTARG
+            ;;
+
+        *)
+            echo "Unknown option: ${OPTION}"
+    esac
+done
+
+
+if [ ! -f $NOXCORE_PID ]; then
+    log "No noxcore pid file: ${NOXCORE_PID}" 
+    echo "No noxcore pid file: ${NOXCORE_PID}" 
+fi
+
+
+if [ ! -d `dirname $LOG_FILE` ]; then
+    mkdir -p `dirname $LOG_FILE`
+fi
+
+let NOXCORE_DOWN=0
+log "===== Starting Monitor ===="
+while `/bin/true`; do
+    # Only check for liveness if the noxcore's PID file exists.  The PID
+    if [ -f $NOXCORE_PID ]; then
+        pid=`cat $NOXCORE_PID`
+        if [ -d /proc/$pid ]; then
+            let NOXCORE_DOWN=0
+        else
+            let NOXCORE_DOWN++
+            log "nox_core not running, rebooting"
+            killall nox_core
+            /etc/init.d/noxcore restart 
+        fi
+    else    
+        log "No noxcore pid file: ${NOXCORE_PID}, starting nox" 
+        killall nox_core
+        /etc/init.d/noxcore restart 
+    fi
+
+    if [ $NOXCORE_DOWN -ge $FAIL_THRESH ]; then
+            log "NOX failed to start ${NOXCORE_DOWN} times...stopping monitor!"
+            exit 1
+    fi
+
+    sleep $INTERVAL 
+done

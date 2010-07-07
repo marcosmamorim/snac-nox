@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components:components xmlns:components="http://www.noxrepo.org/components.xsd">
+
+  <component>
+    <name>storage_schema</name>
+    <dependency>
+      <name>pytransactional storage</name>
+    </dependency>
+    <python>nox.apps.storagews.storage_schema</python>
+  </component>
+
+  <component>
+    <name>storagews</name>
+    <dependency>
+      <name>webservice</name>
+    </dependency>
+    <dependency>
+      <name>storage_schema</name>
+    </dependency>
+    <dependency>
+      <name>pystorage</name>
+    </dependency>
+    <python>nox.apps.storagews.storagews</python>
+  </component>
+
+  <component>
+    <name>transactional_storagews</name>
+    <dependency>
+      <name>webservice</name>
+    </dependency>
+    <dependency>
+      <name>storage_schema</name>
+    </dependency>
+    <dependency>
+      <name>pytransactional storage</name>
+    </dependency>
+    <python>nox.apps.storagews.transactional_storagews</python>
+  </component>
+
+</components:components>

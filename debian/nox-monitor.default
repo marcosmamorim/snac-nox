@@ -1,0 +1,21 @@
+# This is a POSIX shell fragment                -*- sh -*-
+#
+# To configure the Nox monitor package, modify the following.
+# Afterward, the monitor will be configured automatically at boot time.  
+# It can be started immediately with
+#       /etc/init.d/nox-monitor start
+
+# Defaults for initscript
+# sourced by /etc/init.d/nox-monitor
+# installed at /etc/default/nox-monitor by the maintainer scripts
+
+# THRESHOLD: The number of consecutive failed attempts the monitor should make 
+# before giving up altogether
+THRESHOLD=5
+
+# INTERVAL: The number of seconds wait between checks on whether nox is
+# running
+INTERVAL=1
+
+# LOG_FILE: File to log messages related to monitoring.
+LOG_FILE="/var/log/nox/monitor"

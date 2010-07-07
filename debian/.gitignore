@@ -1,0 +1,14 @@
+*.debhelper
+*.debhelper.log
+*.substvars
+/control
+/files
+/nox-dbg
+/noxcore
+/noxext
+/noxext.cron.daily
+/noxext.default
+/noxext.logrotate
+/noxext.postinst
+/rules.ext
+/snacdocs

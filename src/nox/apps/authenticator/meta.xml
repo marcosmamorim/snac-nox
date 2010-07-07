@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components:components xmlns:components="http://www.noxrepo.org/components.xsd">
+  <component>
+    <name>flow_util</name>
+    <library>flowutil</library>
+  </component>
+
+  <component>
+    <name>pyflow_util</name>
+    <dependency>
+      <name>flow_util</name>
+    </dependency>
+    <python>nox.apps.authenticator.pyflowutil</python>
+  </component>
+
+  <component>
+    <name>authenticator</name>
+    <library>authenticator</library>
+    <dependency>
+      <name>bindings_storage</name>
+    </dependency>
+    <dependency>
+      <name>flow_util</name>
+    </dependency>
+    <dependency>
+      <name>topology</name>
+    </dependency>
+    <dependency>
+      <name>routing_module</name>
+    </dependency>
+    <dependency>
+      <name>user_event_log</name>
+    </dependency>
+    <dependency>
+      <name>cdirectorymanager</name>
+    </dependency>
+  </component>
+
+  <component>
+    <name>pyauthenticator</name>
+    <dependency>
+      <name>authenticator</name>
+    </dependency>
+    <dependency>
+      <name>pyflow_util</name>
+    </dependency>
+    <dependency>
+      <name>pydirmanager</name>
+    </dependency>
+    <python>nox.apps.authenticator.pyauth</python>
+  </component>
+
+</components:components>

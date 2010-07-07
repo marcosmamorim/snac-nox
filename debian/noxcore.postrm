@@ -1,0 +1,18 @@
+#!/bin/sh
+# postrm script for nox
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# Automatically added by dh_makeshlibs
+if [ "$1" = "remove" ]; then
+	ldconfig
+fi
+# End automatically added section
+# Automatically added by dh_installinit
+if [ "$1" = "purge" ] ; then
+	update-rc.d noxcore remove >/dev/null || exit $?
+    rm -f /opt/nox/var/lib/nox.cdb
+fi
+# End automatically added section

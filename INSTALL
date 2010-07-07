@@ -1,0 +1,11 @@
+See doc/manual/build/html/index.html for installation instructions
+(or doc/manual/source/installation.rst for a text version with some
+minor markup)
+
+For the impatient:
+
+    ./boot.sh
+    ./configure --with-python=/path/to/python/2.5/ --with-openflow=/path/to/openflow
+    make
+    cd src
+    make check

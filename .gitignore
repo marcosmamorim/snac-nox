@@ -1,0 +1,16 @@
+#*#
+*~
+.#*
+.*.swp
+/_debian
+/aclocal.m4
+/autom4te.cache
+/build-stamp
+/build/*
+/config.h.in
+/configure
+/configure-stamp
+Makefile.in
+TAGS
+cscope.*
+tags

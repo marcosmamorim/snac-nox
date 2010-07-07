@@ -1,0 +1,15 @@
+*.a
+*.la
+*.lo
+*.loT
+*.o
+*.pyc
+*.so
+*_wrap.cc
+.deps
+.libs
+/Makefile
+/Makefile.in
+/components.xsd.cc
+/nox.xsd.cc
+/nox_core

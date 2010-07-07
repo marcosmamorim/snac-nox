@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "configure" ]; then
+    # Obtain keys and certificates for NOX within the OpenFlow PKI.
+    cd /etc/nox
+    if test ! -e cacert.pem; then
+        ln -sf /usr/share/openflow/pki/controllerca/cacert.pem cacert.pem
+    fi
+    if test ! -e privkey.pem || test ! -e cert.pem; then
+        oldumask=$(umask)
+        umask 077
+        ofp-pki req+sign tmp controller >/dev/null
+        mv tmp-privkey.pem privkey.pem
+        mv tmp-cert.pem cert.pem
+        mv tmp-req.pem req.pem
+        chmod go+r cert.pem req.pem
+        umask $oldumask
+    fi
+
+    # Generate self-signed certificate for NOX as an SSL webserver.
+    cd /opt/nox/bin/etc
+    if test ! -e noxca.key.insecure || test ! -e noxca.cert; then
+        ../gen-nox-cert.sh /opt/nox/share/
+    fi
+
+    # Update cdb schema file 
+    if test -e /opt/nox/var/lib/nox.cdb; then
+        echo "Migrating database to new schema"
+        cd /opt/nox/bin/
+        /usr/bin/python ./nox/apps/migration/migration.pyc ../var/lib/nox.cdb
+    fi    
+fi
+
+#DEBHELPER#
+
+exit 0

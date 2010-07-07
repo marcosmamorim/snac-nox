@@ -1,0 +1,14 @@
+Directory: src/nox/apps
+
+Base directory for applications.  All application code should be in this
+directory or one of its subdirectories.  Apps can be added one of two
+ways:
+
+- Add a python file to pyapps directory and update meta.xml 
+
+- Create a directory (see simpleapp/ as an example) and add all .hh,
+  .cc, .i and .py files for the app.  This will require the creation of
+  an xml file to describe the apps dependencies.
+
+Note, utility code should be added to nox/lib/.  The general rule of
+thumb is, if its stateless, it should be there.

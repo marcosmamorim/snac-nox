@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components:components xmlns:components="http://www.noxrepo.org/components.xsd">
+  <component>
+    <name>broadcast_resolve</name>
+    <library>bcast_resolve</library>
+    <dependency>
+      <name>authenticator</name>
+    </dependency>
+  </component>
+</components:components>

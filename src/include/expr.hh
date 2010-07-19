@@ -145,6 +145,7 @@ public:
     uint32_t group_dst;
     uint32_t wildcards;
     uint8_t nw_proto;
+    uint8_t nw_tos;
 };
 
 

@@ -226,6 +226,11 @@ matches(const Flow_expr& expr, const NAT_data& data)
                 return false;
             }
             break;
+        case Flow_expr::DLVLANPCP:
+            if (((uint32_t)(iter->val) == flow.dl_vlan_pcp) == bad_result) {
+                return false;
+            }
+            break;
         case Flow_expr::DLSRC:
             if ((iter->val == flow.dl_src.nb_long()) == bad_result) {
                 return false;
@@ -253,6 +258,11 @@ matches(const Flow_expr& expr, const NAT_data& data)
             break;
         case Flow_expr::NWPROTO:
             if (((uint32_t)(iter->val) == flow.nw_proto) == bad_result) {
+                return false;
+            }
+            break;
+        case Flow_expr::NWTOS:
+            if (((uint32_t)(iter->val) == flow.nw_tos) == bad_result) {
                 return false;
             }
             break;

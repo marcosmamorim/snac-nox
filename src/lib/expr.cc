@@ -239,6 +239,8 @@ matches(const Packet_expr& expr, const Flow& flow)
                 || expr.nw_dst == flow.nw_dst)
             && ((expr.wildcards & Cnode<Packet_expr, void*>::MASKS[Packet_expr::NW_PROTO])
                 || expr.nw_proto == flow.nw_proto)
+            && ((expr.wildcards & Cnode<Packet_expr, void*>::MASKS[Packet_expr::NW_TOS])
+                || expr.nw_tos == flow.nw_tos)
             && ((expr.wildcards & Cnode<Packet_expr, void*>::MASKS[Packet_expr::TP_SRC])
                 || expr.tp_src == flow.tp_src)
             && ((expr.wildcards & Cnode<Packet_expr, void*>::MASKS[Packet_expr::TP_DST])
@@ -272,6 +274,8 @@ matches(const Packet_expr& expr, const Packet_expr& to_match)
                 || expr.nw_dst == to_match.nw_dst)
             && ((to_match.wildcards & Cnode<Packet_expr, void*>::MASKS[Packet_expr::NW_PROTO])
                 || expr.nw_proto == to_match.nw_proto)
+            && ((to_match.wildcards & Cnode<Packet_expr, void*>::MASKS[Packet_expr::NW_TOS])
+                || expr.nw_tos == to_match.nw_tos)
             && ((to_match.wildcards & Cnode<Packet_expr, void*>::MASKS[Packet_expr::TP_SRC])
                 || expr.tp_src == to_match.tp_src)
             && ((to_match.wildcards & Cnode<Packet_expr, void*>::MASKS[Packet_expr::TP_DST])
@@ -335,6 +339,9 @@ Packet_expr::to_string(uint32_t field) const
             break;
         case NW_PROTO:
             sprintf(str,"nwproto=%hhu,", nw_proto);
+            break;
+        case NW_TOS:
+            sprintf(str,"nwtos=%hhu,", nw_tos);
             break;
         case TP_SRC:
             sprintf(str,"tpsrc=%hu,", tp_src);

@@ -377,7 +377,7 @@ SPRouting::set_route(Flow_in_event& fi,
     }
 
     fi.routed_to = Flow_in_event::BROADCASTED;
-    if (fi.flow.dl_dst.is_broadcast()) {
+    if (fi.flow.dl_dst.is_broadcast() || fi.flow.dl_dst.is_multicast()) {
         routing->setup_flow(fi.flow, fi.datapath_id, OFPP_FLOOD,
                             fi.buffer_id, *(fi.buf), BROADCAST_TIMEOUT,
                             actions, check_nat,

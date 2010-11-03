@@ -187,7 +187,10 @@ class discovery(Component):
             # ignore local port
             if port[PORT_NO] == OFPP_LOCAL:
                 continue
-            self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[HW_ADDR], port[PORT_NO], LLDP_TTL);
+            if port[STATE]== openflow.OFPPS_STP_BLOCK:
+                lg.warn('Port '+ str(port[PORT_NO]) + ' on DPID ' + longlong_to_octstr(dp) +' is blocked')
+            else:
+                self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[HW_ADDR], port[PORT_NO], LLDP_TTL);
 
     # --
     # On datapath leave, delete all associated links
@@ -226,9 +229,21 @@ class discovery(Component):
         # Only process 'sane' ports
         if port[PORT_NO] <= openflow.OFPP_MAX:
             if reason == openflow.OFPPR_ADD:
-                self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[HW_ADDR], port[PORT_NO], LLDP_TTL);
+                if port[STATE]== openflow.OFPPS_STP_BLOCK:
+                    lg.warn('Port '+ str(port[PORT_NO]) + ' on DPID ' + longlong_to_octstr(dp) +' is blocked')
+                else:
+                    self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[HW_ADDR], port[PORT_NO], LLDP_TTL);
             elif reason == openflow.OFPPR_DELETE:
                 del self.lldp_packets[dp][port[PORT_NO]]
+            elif reason == openflow.OFPPR_MODIFY:
+                if port[STATE] == openflow.OFPPS_STP_BLOCK:
+                    lg.warn('Port '+ str(port[PORT_NO]) + ' on DPID ' + longlong_to_octstr(dp) +' is blocked')
+                    try:
+                        del self.lldp_packets[dp][port[PORT_NO]]
+                    except KeyError,e:
+                        pass
+                else:
+                    self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[HW_ADDR], port[PORT_NO], LLDP_TTL);
 
         return CONTINUE
 
@@ -298,6 +313,10 @@ class discovery(Component):
 
         if (dp_id, inport) == (chassid, portid):
             lg.error('Loop detected, received our own LLDP event')
+            return
+
+        if inport not in self.lldp_packets[dp_id]:
+            lg.warn('Received LLDP on unavailable or STP-blocked port ' + str(inport) + ' on DPID ' + longlong_to_octstr(dp_id))
             return
 
         # print 'LLDP packet in from',longlong_to_octstr(chassid),' port',str(portid)

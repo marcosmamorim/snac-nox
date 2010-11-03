@@ -17,6 +17,7 @@
 
 import core
 import array
+import re
 from socket import htons
 
 import nox.lib.openflow as openflow
@@ -74,7 +75,7 @@ def convert_to_eaddr(val):
         return val
     if isinstance(val, array.array):
         val = val.tostring()
-    if isinstance(val, str) and not (':' in val):
+    if isinstance(val, str) and re.search("([0-9a-fA-F][0-9a-fA-F]:){6,6}", val+ ":") is None:
         if len(val) < ethernetaddr.LEN:
             return None
         return create_bin_eaddr(val)

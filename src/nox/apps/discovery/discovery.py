@@ -62,7 +62,7 @@ def create_discovery_packet(dpid, hwaddr, portno, ttl_):
     cid = chassis_id()
 
     # nbo 
-    cid.fill(4, array.array('B', struct.pack('!Q',dpid))[2:8])
+    cid.fill(chassis_id.SUB_NETWORK, array.array('B', struct.pack('!Q',dpid)))
     discovery_packet.add_tlv(cid)
 
     pid = port_id()
@@ -287,20 +287,33 @@ class discovery(Component):
             return
 
         # parse out chassis id 
-        if lldph.tlvs[0].subtype != chassis_id.SUB_MAC:
-            lg.error("lldp chassis ID subtype is not MAC, ignoring")
+        if lldph.tlvs[0].subtype == chassis_id.SUB_MAC:
+            assert(len(lldph.tlvs[0].id) == 6)
+            cid = lldph.tlvs[0].id
+
+            # convert 48bit cid (in nbo) to longlong
+            chassid = cid[5]       | cid[4] << 8  | \
+                      cid[3] << 16 | cid[2] << 24 |  \
+                      cid[1] << 32 | cid[0] << 40
+
+        elif lldph.tlvs[0].subtype == chassis_id.SUB_NETWORK:
+            assert(len(lldph.tlvs[0].id) == 8)
+            cid = lldph.tlvs[0].id
+
+            # convert 48bit cid (in nbo) to longlong
+            chassid = cid[7]       | cid[6] << 8  | \
+                      cid[5] << 16 | cid[4] << 24 | \
+                      cid[3] << 32 | cid[2] << 40 | \
+                      cid[1] << 48 | cid[0] << 56
+
+        else:
+            lg.error("lldp chassis ID subtype is not recognized. ignoring")
             return
-        assert(len(lldph.tlvs[0].id) == 6)
-        cid = lldph.tlvs[0].id
-    
-        # convert 48bit cid (in nbo) to longlong
-        chassid = cid[5]       | cid[4] << 8  | \
-                  cid[3] << 16 | cid[2] << 24 |  \
-                  cid[1] << 32 | cid[0] << 40 
 
         # if chassid is from a switch we're not connected to, ignore
         if chassid not in self.dps:
-            lg.debug('Recieved LLDP packet from unconnected switch')
+            lg.debug('Recieved LLDP packet from unconnected switch'+\
+                      longlong_to_octstr(chassid))
             return
     
         # grab 16bit port ID from port tlv

@@ -217,9 +217,9 @@ class dm_ws_switch:
         try:
             name   = arg['<switch table>']
             stats = {}
-            stats['active_count'] = 0
-            stats['lookup_count'] = 0
-            stats['matched_count'] = 0
+            stats['active_flows']  = 0
+            stats['lookup_pkts'] = 0
+            stats['matched_pkts'] = 0
             stats_tbl = self.switchstats.dp_table_stats
             dpid = switch_info.dpid.as_host()
 

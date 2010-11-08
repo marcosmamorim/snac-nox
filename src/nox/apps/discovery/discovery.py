@@ -14,45 +14,8 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with NOX.  If not, see <http://www.gnu.org/licenses/>.
-#======================================================================
-# LLDP discovery application for topology inference
-#
-# This application handles generation and parsing/interpreting LLDP
-# packets for all switches on the network. The bulk of the functionality
-# is performed in the following handlers:
-#
-# send_lldp() : this is a generator function which is called in a timer
-# every timeout period.  It iterates over all ports on the network and
-# sends an LLDP packet on each invocation (note: that is exactly *one*
-# packet per timeout period).  The LLDP packets contain the chassis ID,
-# and the port number of the outgoing switch/port
-#
-# lldp_input_handler() : packet_in handler called on receipt of an LLDP
-# packet. This infers the link-level connectivity by querying the LLDP
-# packets.  The network links are stored in the instance variable
-# adjacency_list
-#
-# timeout_links() : periodically iterates over the discovered links on
-# the network and detects timeouts.  Timeouts update the global view and
-# generate a node changed event
-#
-# Inferring links:
-#
-# Each LLDP packet contains the sending port and datapath ID.  The
-# datapath is currently encoded as a 48bit MAC in the chassis ID TLV,
-# hence the lower 16bits are always 0. 
-#
-# Shortcomings:
-#
-# XXX
-#
-# The fundamental problem with a centralized approach to topology
-# discovery is that all ports must be scanned linearly which greatly
-# reduces response time. 
-#
-# This should really be implemented on the switch
-#
-#======================================================================
+
+
 
 from nox.lib.core import *
 
@@ -78,10 +41,9 @@ import time
 import copy
 
 LLDP_TTL             = 120 # currently ignored
-LLDP_SEND_PERIOD     = 1.0 
+LLDP_SEND_PERIOD     = 2.0
 TIMEOUT_CHECK_PERIOD = 5.
-#LINK_TIMEOUT         = 10.
-LINK_TIMEOUT         = 30.
+LINK_TIMEOUT         = 10.
 
 lg = logging.getLogger('discovery')
 
@@ -93,7 +55,7 @@ lg = logging.getLogger('discovery')
 # 
 # ---------------------------------------------------------------------- 
   
-def create_discovery_packet(dpid, portno, hw_addr, ttl_):    
+def create_discovery_packet(dpid, hwaddr, portno, ttl_):
 
     # Create lldp packet
     discovery_packet = lldp()
@@ -114,25 +76,58 @@ def create_discovery_packet(dpid, portno, hw_addr, ttl_):
     discovery_packet.add_tlv(end_tlv())
 
     eth = ethernet()
-    # If the switch is reporting MAC address same as DPID, then we
-    # should try to distinguish from it somehow using local MAC addr
-    if hw_addr == struct.pack('!Q',dpid)[2:8]:
+
+    # Ideally, LLDPs sent out of a port shud have its hwaddr. But,
+    # if the switch is reporting MAC address same as DPID, then we
+    # shud distinguish from it using local MAC addr. This also
+    # insures that the LLDP src mac addr is not a multicast addr.
+    if hwaddr == struct.pack('!Q',dpid)[2:8]:
         eth.src = struct.pack('!Q', dpid | 0x020000000000)[2:8]
     else:
-        eth.src = hw_addr
+        eth.src = hwaddr
+
     eth.dst = NDP_MULTICAST
     eth.set_payload(discovery_packet)
     eth.type = ethernet.LLDP_TYPE
 
     return eth
 
-# ---------------------------------------------------------------------- 
-# Component Discovery
+## \ingroup noxcomponents
+# LLDP discovery application for topology inference
 #
-# - Sends/receives LLDP packets for all ports on all switches
-# - Post's Link_events on link detection and link changes 
+# This application handles generation and parsing/interpreting LLDP
+# packets for all switches on the network. The bulk of the functionality
+# is performed in the following handlers:
+# <ul>
+# <li>send_lldp() : this is a generator function which is called in a timer
+# every timeout period.  It iterates over all ports on the network and
+# sends an LLDP packet on each invocation (note: that is exactly *one*
+# packet per timeout period).  The LLDP packets contain the chassis ID,
+# and the port number of the outgoing switch/port
 #
-# ---------------------------------------------------------------------- 
+# <li>lldp_input_handler() : packet_in handler called on receipt of an LLDP
+# packet. This infers the link-level connectivity by querying the LLDP
+# packets.  The network links are stored in the instance variable
+# adjacency_list
+#
+# <li>timeout_links() : periodically iterates over the discovered links on
+# the network and detects timeouts.  Timeouts update the global view and
+# generate a node changed event
+# </ul>
+#
+# <b>Inferring links:</b><br>
+# <br>
+# Each LLDP packet contains the sending port and datapath ID.  The
+# datapath is currently encoded as a 48bit MAC in the chassis ID TLV,
+# hence the lower 16bits are always 0.
+#
+# <b>Shortcomings:</b>
+#
+# The fundamental problem with a centralized approach to topology
+# discovery is that all ports must be scanned linearly which greatly
+# reduces response time.
+#
+# This should really be implemented on the switch
 
 class discovery(Component):
 
@@ -166,7 +161,7 @@ class discovery(Component):
     def install(self):
         self.register_for_datapath_join ( lambda dp,stats : discovery.dp_join(self, dp, stats) )
         self.register_for_datapath_leave( lambda dp       : discovery.dp_leave(self, dp) )
-        self.register_for_port_status( lambda dp, reason, port : discovery.handle_port_status(self, dp, reason, port) )
+        self.register_for_port_status( lambda dp, reason, port : discovery.port_status_change(self, dp, reason, port) )
         # register handler for all LLDP packets 
         match = {DL_DST : array_to_octstr(array.array('B',NDP_MULTICAST)),\
                   DL_TYPE: ethernet.LLDP_TYPE}
@@ -189,7 +184,10 @@ class discovery(Component):
   
         self.lldp_packets[dp]  = {}
         for port in stats[PORTS]:
-            self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[PORT_NO], port[HW_ADDR], LLDP_TTL);
+            # ignore local port
+            if port[PORT_NO] == OFPP_LOCAL:
+                continue
+            self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[HW_ADDR], port[PORT_NO], LLDP_TTL);
 
     # --
     # On datapath leave, delete all associated links
@@ -209,23 +207,28 @@ class discovery(Component):
     
         self.delete_links(deleteme)
 
-    def handle_port_status(self, dp, reason, port):
-        '''Port_status_event handler
 
-        Handles port stats events, such as adding and deleting ports
+    # --
+    # Update the list of LLDP packets if ports are added/removed
+    # --
 
-        dp - Datapath ID of port
+    def port_status_change(self, dp, reason, port):
+        '''Update LLDP packets on port status changes
 
-        reason - what event occured
+        Add to the list of LLDP packets if a port is added.
+        Delete from the list of LLDP packets if a port is removed.
 
-        port - port
+        Keyword arguments:
+        dp -- Datapath ID of port
+        reason -- what event occured
+        port -- port
         '''
-        # Work out what sort of event we're processing
-        if reason == openflow.OFPPR_ADD:
-            if port[PORT_NO] <= openflow.OFPP_MAX:
-                self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[PORT_NO], port[HW_ADDR], LLDP_TTL);
-        elif reason == openflow.OFPPR_DELETE:
-            del self.lldp_packets[dp][port[PORT_NO]]
+        # Only process 'sane' ports
+        if port[PORT_NO] <= openflow.OFPP_MAX:
+            if reason == openflow.OFPPR_ADD:
+                self.lldp_packets[dp][port[PORT_NO]] = create_discovery_packet(dp, port[HW_ADDR], port[PORT_NO], LLDP_TTL);
+            elif reason == openflow.OFPPR_DELETE:
+                del self.lldp_packets[dp][port[PORT_NO]]
 
         return CONTINUE
 
@@ -301,7 +304,7 @@ class discovery(Component):
     
         linktuple = (dp_id, inport, chassid, portid)
     
-        if linktuple not in self.adjacency_list.keys():
+        if linktuple not in self.adjacency_list:
             self.add_link(linktuple)
             lg.warn('new link detected ('+longlong_to_octstr(linktuple[0])+' p:'\
                        +str(linktuple[1]) +' -> '+\
@@ -331,9 +334,6 @@ class discovery(Component):
                     continue
                 try:    
                     for port in packets[dp]:
-                        # ignore local port
-                        if port == OFPP_LOCAL: 
-                            continue
                         #print 'Sending packet out of ',longlong_to_octstr(dp), ' port ',str(port)
                         self.send_openflow_packet(dp, packets[dp][port].tostring(), port)
                     yield dp 

@@ -12,7 +12,7 @@
 -include debian/rules.ext
 
 # Official build number.  Leave set to 0 if not an official build.
-BUILD_NUMBER = 0
+BUILD_NUMBER = 1
 
 configure: configure-stamp
 configure-stamp:

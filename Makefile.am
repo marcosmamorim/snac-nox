@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = foreign 1.10
+AUTOMAKE_OPTIONS = foreign 1.9.6
 ACLOCAL_AMFLAGS = -I config
 
 SUBDIRS = src $(subdirs) doc man

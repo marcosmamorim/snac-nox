@@ -328,7 +328,7 @@ public:
                                          nwdst, callable)
 
     def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return PyAuth(context)
 

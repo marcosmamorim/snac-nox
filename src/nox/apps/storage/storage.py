@@ -202,7 +202,7 @@ class StorageException(Exception):
         return repr(str(self.code) + ": " + self.message)
 
 def getFactory():
-    class Factory():
+    class Factory:
         def instance(self, context):
             from nox.apps.storage.storage import Storage
             from nox.apps.storage.pystorage import PyStorage

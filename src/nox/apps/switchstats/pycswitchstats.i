@@ -64,7 +64,7 @@ class pycswitchstats(Component):
 
 
 def getFactory():
-      class Factory():
+      class Factory:
           def instance(self, context):
               return pycswitchstats(context)
 

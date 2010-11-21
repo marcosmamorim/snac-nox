@@ -24,7 +24,7 @@ log = logging.getLogger('properties_test')
 
 SECTION = 'property_test_section'
 
-class DeleteSection():
+class DeleteSection:
     def __init__(self, storage, section):
         self.storage = storage
         self.section = section

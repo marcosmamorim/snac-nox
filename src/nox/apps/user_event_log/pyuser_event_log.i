@@ -182,7 +182,7 @@ struct LogEntry {
           self.proxy.remove(max_logid,cb)
 
   def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return pyuser_event_log(context)
 

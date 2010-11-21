@@ -111,7 +111,7 @@ bool dp_on_route(const datapathid& dp, const Routing_module::Route& route);
                                             buf, actions, check_nat, flow)
 
     def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return PyRouting(context)
 

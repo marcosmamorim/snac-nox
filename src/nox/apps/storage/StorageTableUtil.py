@@ -350,7 +350,7 @@ class StorageRecord(object):
         return ret
 
 
-class StorageTable():
+class StorageTable:
     """\
     A class representing a storage table with StorageRecord rows
 

@@ -259,13 +259,11 @@ class VigilLogger(logging.Logger):
         else:
             return v.is_emer_enabled(self.vigil_logger_id)
 
-    def makeRecord(self, name, level, fn, lno, msg, args, exc_info, 
-                   func=None, extra=None):
+    def makeRecord(self, name, level, fn, lno, msg, args, exc_info):
         """
         Inject the vigil logger id into a standard Python log record.
         """
-        rv = logging.Logger.makeRecord(self, name, level, fn, lno, msg, args,
-                                       exc_info, func, extra)
+        rv = logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info)
         rv.__dict__['vigil_logger_id'] = self.vigil_logger_id
         return rv
 

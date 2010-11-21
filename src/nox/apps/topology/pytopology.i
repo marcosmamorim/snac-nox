@@ -84,7 +84,7 @@ class pytopology(Component):
 
 
 def getFactory():
-    class Factory():
+    class Factory:
         def instance(self, context):
                     
             return pytopology(context)

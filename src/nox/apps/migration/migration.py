@@ -16,7 +16,7 @@ import shutil
 import sqlite3
 import sys
 
-class Plugin():
+class Plugin:
     """
     A plugin migrates a row from a table version to next.  All plugins
     should implement this interface.

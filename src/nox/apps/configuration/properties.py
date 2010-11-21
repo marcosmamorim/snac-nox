@@ -423,7 +423,7 @@ class Properties(dict):
     def keys(self):
         return self.__kvp.keys()
 
-class Property():
+class Property:
     def __init__(self, guid, dirty, value):
         assert(not isinstance(value, Property))
 
@@ -441,7 +441,7 @@ class Property():
         else:
             return cmp(self.value, other)
 
-class PropertyList():
+class PropertyList:
 
     def __init__(self, properties, key, values):
         self.__values__ = []
@@ -630,7 +630,7 @@ class PropertyList():
 
         self.__values__.sort()
 
-class PropertyListIter():
+class PropertyListIter:
     def __init__(self, i):
         self.i = i
 

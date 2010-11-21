@@ -49,7 +49,7 @@ class SimpleUELUtil(Component):
 
   
 def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return SimpleUELUtil(context)
 

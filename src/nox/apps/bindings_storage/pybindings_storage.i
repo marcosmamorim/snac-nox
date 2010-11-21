@@ -161,7 +161,7 @@ using namespace vigil::applications;
         return d
 
   def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return pybindings_storage(context)
 

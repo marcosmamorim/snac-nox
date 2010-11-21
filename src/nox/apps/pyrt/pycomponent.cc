@@ -50,7 +50,7 @@ PyComponent::PyComponent(const Context* c, const xercesc::DOMNode* conf)
                        getTextContent());
     lg.dbg("Importing Python module %s", module.c_str());
 
-    PyObject* m = PyImport_ImportModule(module.c_str());
+    PyObject* m = PyImport_ImportModule((char *) module.c_str());
     if (!m) {
         throw runtime_error("cannot import a Python module '" + module +
                             "':\n" + pretty_print_python_exception());

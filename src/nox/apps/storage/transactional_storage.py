@@ -214,7 +214,7 @@ class TransactionalCursor:
         pass
 
 def getFactory():
-    class Factory():
+    class Factory:
         def instance(self, context):
             from storage import Storage
             from pytransactional_storage import PyTransactional_storage

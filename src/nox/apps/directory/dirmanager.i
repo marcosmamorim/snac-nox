@@ -309,7 +309,7 @@ struct Location_delete_event
             return self.dm.set_create_cred(cred_)
 
     def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return PyDirManager(context)
 

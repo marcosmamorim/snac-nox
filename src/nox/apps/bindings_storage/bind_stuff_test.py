@@ -59,7 +59,7 @@ class BindStuffTest(Component):
       
   
 def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return BindStuffTest(context)
 

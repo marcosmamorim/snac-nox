@@ -203,7 +203,7 @@ public:
             return self.flowutil.set_action_argument(action, arg, fn_args)
 
     def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return PyFlowUtil(context)
 

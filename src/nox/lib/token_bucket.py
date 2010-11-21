@@ -16,7 +16,7 @@
 # along with NOX.  If not, see <http://www.gnu.org/licenses/>.
 from time import time
 
-class TokenBucket():
+class TokenBucket:
     """A trivial token bucket implementation"""
     def __init__(self, tokens, rate):
         self._tokens = tokens

@@ -103,7 +103,7 @@ using namespace vigil::applications;
       return self.pff.get_flows()
 
   def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return flow_fetcher_app(context)
 

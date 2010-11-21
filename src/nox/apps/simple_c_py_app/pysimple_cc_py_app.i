@@ -54,7 +54,7 @@ using namespace vigil::applications;
 
 
   def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                         
                 return pysimple_cc_py_app(context)

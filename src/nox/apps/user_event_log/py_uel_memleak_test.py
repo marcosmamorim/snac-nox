@@ -133,7 +133,7 @@ class UserEventLogMemCheck(Component):
 
   
 def getFactory():
-        class Factory():
+        class Factory:
             def instance(self, context):
                 return UserEventLogMemCheck(context)
 

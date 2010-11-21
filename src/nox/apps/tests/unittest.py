@@ -148,7 +148,7 @@ def gather_tests(tests, ctxt):
     for module in hierarchy.keys():
         try:
             name = testnamespace + module
-            mod = __import__(name, globals(), locals(), ['suite'], -1)
+            mod = __import__(name, globals(), locals(), ['suite'])
             suite = pyunit.TestSuite()
             if not hasattr(mod, "suite"):
                 continue

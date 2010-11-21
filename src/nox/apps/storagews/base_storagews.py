@@ -180,7 +180,7 @@ class WSPathValidDBGUID(webservice.WSPathComponent):
         return webservice.WSPathExtractResult(value=("GUID", guid))
 
 
-class base_storagews():
+class base_storagews:
 
     def __init__(self):
         pass

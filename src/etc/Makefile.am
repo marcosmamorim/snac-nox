@@ -2,8 +2,6 @@ include ../Make.vars
 
 dist_bin_SCRIPTS = \
 	gen-nox-cert.sh 
-bin_SCRIPTS = \
-	gen-nox-cert.sh 
 data_DATA = \
 	noxca.cnf
 

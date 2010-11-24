@@ -179,8 +179,7 @@ static void convert_datapath_join(const Event& e, PyObject* proxy) {
     pyglue_setattr_string(proxy, "actions",    to_python(sfe.actions));
     pyglue_setattr_string(proxy, "ports", to_python<vector<Port> >(sfe.ports));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_table_stats_in(const Event& e, PyObject* proxy) {
@@ -190,8 +189,7 @@ static void convert_table_stats_in(const Event& e, PyObject* proxy) {
     pyglue_setattr_string(proxy, "datapath_id", to_python(tsi.datapath_id));
     pyglue_setattr_string(proxy, "tables"    , to_python<vector<Table_stats> >(tsi.tables));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_aggregate_stats_in(const Event& e, PyObject* proxy) {
@@ -203,8 +201,7 @@ static void convert_aggregate_stats_in(const Event& e, PyObject* proxy) {
     pyglue_setattr_string(proxy, "byte_count", to_python(asi.byte_count));
     pyglue_setattr_string(proxy, "flow_count", to_python(asi.flow_count));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_desc_stats_in(const Event& e, PyObject* proxy) {
@@ -218,8 +215,7 @@ static void convert_desc_stats_in(const Event& e, PyObject* proxy) {
     pyglue_setattr_string(proxy, "dp_desc", to_python(dsi.dp_desc));
     pyglue_setattr_string(proxy, "serial_num", to_python(dsi.serial_num));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_port_stats_in(const Event& e, PyObject* proxy) {
@@ -229,8 +225,7 @@ static void convert_port_stats_in(const Event& e, PyObject* proxy) {
     pyglue_setattr_string(proxy, "datapath_id", to_python(psi.datapath_id));
     pyglue_setattr_string(proxy, "ports"    , to_python<vector<Port_stats> >(psi.ports));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_datapath_leave(const Event&e, PyObject* proxy) {
@@ -239,13 +234,11 @@ static void convert_datapath_leave(const Event&e, PyObject* proxy) {
 
     pyglue_setattr_string(proxy, "datapath_id", to_python(dple.datapath_id));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_bootstrap_complete(const Event&e, PyObject* proxy) {
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_flow_removed(const Event& e, PyObject* proxy) {
@@ -260,8 +253,7 @@ static void convert_flow_removed(const Event& e, PyObject* proxy) {
     assert(fre.get_flow());
     pyglue_setattr_string(proxy, "flow", to_python(*fre.get_flow()));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }   
 
 static void convert_flow_mod(const Event& e, PyObject* proxy) {
@@ -270,8 +262,7 @@ static void convert_flow_mod(const Event& e, PyObject* proxy) {
     pyglue_setattr_string(proxy, "datapath_id", to_python(fme.datapath_id));
     pyglue_setattr_string(proxy, "flow_mod", to_python(*fme.get_flow_mod()));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_packet_in(const Event& e, PyObject* proxy) {
@@ -285,8 +276,7 @@ static void convert_packet_in(const Event& e, PyObject* proxy) {
     pyglue_setattr_string(proxy, "buf", to_python<boost::shared_ptr<Buffer> >
                           (pie.get_buffer()));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 static void convert_port_status(const Event& e, PyObject* proxy) {
@@ -296,15 +286,13 @@ static void convert_port_status(const Event& e, PyObject* proxy) {
     pyglue_setattr_string(proxy, "port",   to_python<Port>(pse.port));
     pyglue_setattr_string(proxy, "datapath_id", to_python(pse.datapath_id));
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }   
 
 static void convert_shutdown(const Event& e, PyObject* proxy) {
     //const Shutdown_event& se = dynamic_cast<const Shutdown_event&>(e);
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 PyRt::PyRt(const Context* c,
@@ -594,8 +582,7 @@ Python_event_manager::call_python_handler(const Event& e,
                                 pretty_print_python_exception());
         }
         
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(py_event);
-        if (!swigo || ((PySwigObject*)swigo)->ptr == NULL) {
+        if (!SWIG_Python_GetSwigThis(py_event) || !SWIG_Python_GetSwigThis(py_event)->ptr) {
             Py_DECREF(py_event);   
             throw runtime_error("call_python_handler unable "
                                 "to recover C++ object from PyEvent.");

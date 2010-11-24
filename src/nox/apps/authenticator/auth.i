@@ -100,18 +100,16 @@ struct Host_event
         pyglue_setattr_string(proxy, "nwaddr", to_python(he.nwaddr));
         pyglue_setattr_string(proxy, "name", to_python(he.name));
 
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-        ((Event*)swigo->ptr)->operator=(e);
+        ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
     }
 
     static void register_event_converter(PyObject *ctxt) {
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(ctxt);
-        if (!swigo || !swigo->ptr) {
+        if (!SWIG_Python_GetSwigThis(ctxt) || !SWIG_Python_GetSwigThis(ctxt)->ptr) {
             throw std::runtime_error("Unable to access Python context.");
         }
         
         vigil::applications::PyContext* pyctxt = 
-            (vigil::applications::PyContext*)swigo->ptr;
+            (vigil::applications::PyContext*)SWIG_Python_GetSwigThis(ctxt)->ptr;
         pyctxt->register_event_converter<Host_event>
             (&Host_event_fill_python_event);
     }
@@ -163,18 +161,16 @@ struct User_event
         pyglue_setattr_string(proxy, "dladdr", to_python(he.dladdr));
         pyglue_setattr_string(proxy, "nwaddr", to_python(he.nwaddr));
 
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-        ((Event*)swigo->ptr)->operator=(e);
+        ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
     }
 
     static void register_event_converter(PyObject *ctxt) {
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(ctxt);
-        if (!swigo || !swigo->ptr) {
+        if (!SWIG_Python_GetSwigThis(ctxt) || !SWIG_Python_GetSwigThis(ctxt)->ptr) {
             throw std::runtime_error("Unable to access Python context.");
         }
         
         vigil::applications::PyContext* pyctxt = 
-            (vigil::applications::PyContext*)swigo->ptr;
+            (vigil::applications::PyContext*)SWIG_Python_GetSwigThis(ctxt)->ptr;
         pyctxt->register_event_converter<User_event>
             (&User_event_fill_python_event);
     }
@@ -240,18 +236,16 @@ struct Auth_event
         pyglue_setattr_string(proxy, "inactivity_timeout", to_python(ae.inactivity_timeout));
         pyglue_setattr_string(proxy, "hard_timeout", to_python(ae.hard_timeout));
 
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-        ((Event*)swigo->ptr)->operator=(e);
+        ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
     }
 
     static void register_event_converter(PyObject *ctxt) {
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(ctxt);
-        if (!swigo || !swigo->ptr) {
+        if (!SWIG_Python_GetSwigThis(ctxt) || !SWIG_Python_GetSwigThis(ctxt)->ptr) {
             throw std::runtime_error("Unable to access Python context.");
         }
         
         vigil::applications::PyContext* pyctxt = 
-            (vigil::applications::PyContext*)swigo->ptr;
+            (vigil::applications::PyContext*)SWIG_Python_GetSwigThis(ctxt)->ptr;
         pyctxt->register_event_converter<Auth_event>
             (&Auth_event_fill_python_event);
     }

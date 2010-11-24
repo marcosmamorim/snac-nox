@@ -105,11 +105,11 @@ template <>
 const container::Context*
 from_python(PyObject* ctxt)
 {
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(ctxt);
-    if (!swigo || !swigo->ptr) {
+    if (!SWIG_Python_GetSwigThis(ctxt) || !SWIG_Python_GetSwigThis(ctxt)->ptr) {
         throw runtime_error("Unable to access Python context.");
     }
-    applications::PyContext* pyctxt = (applications::PyContext*)swigo->ptr;
+    applications::PyContext* pyctxt = (applications::PyContext*)
+        SWIG_Python_GetSwigThis(ctxt)->ptr;
     return pyctxt->ctxt;
 }
 

@@ -43,12 +43,11 @@ namespace applications {
 
 user_event_log_proxy::user_event_log_proxy(PyObject* ctxt) : uel(0) 
 {
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(ctxt);
-    if (!swigo || !swigo->ptr) {
+    if (!SWIG_Python_GetSwigThis(ctxt) || !SWIG_Python_GetSwigThis(ctxt)->ptr) {
         throw runtime_error("Unable to access Python context.");
     }
     
-    c = ((PyContext*)swigo->ptr)->c;
+    c = ((PyContext*)SWIG_Python_GetSwigThis(ctxt)->ptr)->c;
 }
 
 void user_event_log_proxy::log_simple(const string &app_name, int level, 

@@ -8,12 +8,11 @@ namespace applications {
 PyDirectoryManager::PyDirectoryManager(PyObject *ctxt)
     : dm(NULL)
 {
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(ctxt);
-    if (!swigo || !swigo->ptr) {
+    if (!SWIG_Python_GetSwigThis(ctxt) || !SWIG_Python_GetSwigThis(ctxt)->ptr) {
         throw std::runtime_error("Unable to access Python context.");
     }
 
-    c = ((PyContext*)swigo->ptr)->c;
+    c = ((PyContext*)SWIG_Python_GetSwigThis(ctxt)->ptr)->c;
 }
 
 void

@@ -121,8 +121,7 @@ static void convert_python_event(const Event& e, PyObject* proxy) {
         Py_INCREF(Py_None);
     }
 
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-    ((Event*)swigo->ptr)->operator=(e);
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
 }
 
 void 

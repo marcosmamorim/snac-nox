@@ -166,12 +166,11 @@ revise_events()
 }
 
 oxidereactor::oxidereactor(PyObject* ctxt, PyObject *name) {
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(ctxt);
-    if (!swigo || !swigo->ptr) {
+    if (!SWIG_Python_GetSwigThis(ctxt) || !SWIG_Python_GetSwigThis(ctxt)->ptr) {
         throw runtime_error("Unable to access Python context.");
     }
     
-    c = ((PyContext*)swigo->ptr)->c;
+    c = ((PyContext*)SWIG_Python_GetSwigThis(ctxt)->ptr)->c;
 
     pycb_thread = co_fsm_create(&co_group_coop, run_python_callbacks);
 }
@@ -261,9 +260,8 @@ oxidereactor::callLater(long delay_secs, long delay_usecs,
     
     PyObject* pdc = PyObject_GetAttrString(pydelayedcall, (char*)"dc");
     // dc is a new reference
-    PySwigObject* swigo = SWIG_Python_GetSwigThis(pdc);
-    Py_XDECREF(pdc);   
-    delayedcall* dc = (delayedcall*)((PySwigObject*)swigo)->ptr;
+    Py_XDECREF(pdc);
+    delayedcall* dc = (delayedcall*)(SWIG_Python_GetSwigThis(pdc))->ptr;
     const timeval tv = {delay_secs, delay_usecs};
     {
         boost::intrusive_ptr<PyObject> cptr(pydelayedcall, true);

@@ -84,18 +84,16 @@ struct Flow_in_event
         pyglue_setattr_string(proxy, "buffer_id", to_python(fi.buffer_id));
         pyglue_setattr_string(proxy, "reason", to_python(fi.reason));
 
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(proxy);
-        ((Event*)swigo->ptr)->operator=(e);
+        ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
     }
 
     static void register_event_converter(PyObject *ctxt) {
-        PySwigObject* swigo = SWIG_Python_GetSwigThis(ctxt);
-        if (!swigo || !swigo->ptr) {
+        if (!SWIG_Python_GetSwigThis(ctxt) || !SWIG_Python_GetSwigThis(ctxt)->ptr) {
             throw std::runtime_error("Unable to access Python context.");
         }
         
         vigil::applications::PyContext* pyctxt = 
-            (vigil::applications::PyContext*)swigo->ptr;
+            (vigil::applications::PyContext*)SWIG_Python_GetSwigThis(ctxt)->ptr;
         pyctxt->register_event_converter<Flow_in_event>
             (&Flow_in_event_fill_python_event);
     }

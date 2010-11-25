@@ -23,6 +23,7 @@ import signal
 import nox.lib.core
 import oxidereactor
 import twisted
+import sys
 import logging, types
 from   twisted.internet import base, error, interfaces, posixbase, task
 from   twisted.internet.process import reapAllProcesses
@@ -259,11 +260,14 @@ class VigilLogger(logging.Logger):
         else:
             return v.is_emer_enabled(self.vigil_logger_id)
 
-    def makeRecord(self, name, level, fn, lno, msg, args, exc_info):
+    def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
         """
         Inject the vigil logger id into a standard Python log record.
         """
-        rv = logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info)
+        if (sys.hexversion >= 0x02050000):
+            rv = logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
+        else:
+            rv = logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info)
         rv.__dict__['vigil_logger_id'] = self.vigil_logger_id
         return rv
 

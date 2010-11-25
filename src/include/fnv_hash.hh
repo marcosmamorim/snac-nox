@@ -36,6 +36,17 @@ inline uint32_t fnv_hash(const void* data, size_t size,
     return value;
 }
 
+inline uint64_t fnv_hash_64(const void* data, size_t size,
+                            uint64_t value = 0xCBF29CE484222325ULL)
+{
+    const uint8_t* p = static_cast<const uint8_t*>(data);
+    while (size-- > 0) {
+	value *= 0x100000001B3ULL;    /* Magic Fowler-Noll-Vo prime for 64-bit. */
+        value ^= *p++;
+    }
+    return value;
+}
+
 } // namespace vigil
 
 #endif /* fnv_hash.hh */

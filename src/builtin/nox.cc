@@ -40,6 +40,7 @@
 #include "timeval.hh"
 #include "vlog.hh"
 #include "switch_auth.hh"
+#include "fnv_hash.hh"
 
 namespace vigil {
 namespace nox {
@@ -93,7 +94,7 @@ Conn::~Conn()
 }
 
 static boost::shared_ptr<Openflow_connection>
-dpid_to_oconn(datapathid dpid)
+dpid_to_oconn(const datapathid& dpid)
 {
     chashmap::iterator iter = connection_map.find(dpid);
     if (iter == connection_map.end()) {
@@ -759,8 +760,34 @@ void Handshake_fsm::recv_message() {
           // save features reply for switch auth and registration 
           features_reply_buf = buf;
           features_reply = features_reply_buf->try_at<ofp_switch_features>(0);
-          if(features_reply) 
+          if(features_reply) {
+            // The following code is a hack to support multiple VLAN tags on
+            // the same switch. In that case (at least for HP switches) the
+            // top 16 bits of the datapath id are set to the VLAN tag. But the
+            // NOX code truncates the datapath id to the low 48 bits, which
+            // is typically the same as the MAC address of the switch, so the
+            // VLAN part gets lost. It would be non-trivial to update this version
+            // of the NOX code to fix that problem, so the hack workaround is to
+            // hash the full 64 bit datapath id to 48 bits and use that as the
+            // effective datapath id that's used within NOX. It only does the
+            // hashing when it needs to (i.e. when the top 16 bits are non-zero).
+            // Also, we do the hashing at this point in the code, because this
+            // is the only place where we get the original datapath id from the
+            // switch. We tweak the value in the ofp_switch_feature struct
+            // (hack upon hack), because that struct is passed around to a bunch
+            // of different places in the code and we'd need to update all of
+            // those places to do the hashing if we didn't do it here.
+            datapathid dpid = datapathid::from_net(features_reply->datapath_id);
+            const uint64_t mask = (UINT64_C(1) << 48) - 1;
+            uint64_t dpid_value = dpid.as_host();
+            if (dpid_value > mask)
+            {
+              dpid_value = fnv_hash_64((const void*)&dpid_value,8) & mask;
+              dpid = datapathid::from_host(dpid_value);
+              features_reply->datapath_id = dpid.as_net();
+            }
             state = CHECK_SWITCH_AUTH; 
+          }
           break;
         case OFPT_ECHO_REQUEST:
           oconn->send_echo_reply(oh);

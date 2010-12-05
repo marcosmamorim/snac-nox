@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(nox, 0.4.0~beta, contact@noxrepo.org)
+AC_INIT(nox, 0.4.1~beta, contact@noxrepo.org)
 AC_CONFIG_AUX_DIR(config)
 
 NX_BUILDNR

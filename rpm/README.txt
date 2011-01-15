@@ -12,8 +12,8 @@ sudo sed -i 's/^enabled=.*/enabled=0/g' /etc/yum/pluginconf.d/fastestmirror.conf
 sudo yum -y install boost-devel ccache sqlite-devel swig openssl-devel xerces-c-devel libtool automake autoconf rpmdevtools yum-utils \
   emacs-nox gcc-c++ git perl-Error python-sphinx openldap-devel java python-devel python-mako python-twisted-web python-simplejson
 
-git clone -b eswierk.1 git@github.com:bigswitch/snac-nox.git
-git clone -b eswierk.1 git@github.com:bigswitch/snac.git snac-nox/src/nox/ext
+git clone git@github.com:bigswitch/snac-nox.git
+git clone git@github.com:bigswitch/snac.git snac-nox/src/nox/ext
 
 cd ~/snac-nox
 mkdir build

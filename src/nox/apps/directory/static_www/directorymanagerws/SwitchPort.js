@@ -78,7 +78,8 @@ dojo.declare("nox.apps.directory.directorymanagerws.SwitchPort", [ nox.apps.core
     },
 
     wsv1Path: function () {
-        return this.switchObj.wsv1Path() + "/port/" + this._data.name;
+        return this.switchObj.wsv1Path() + "/port/" +
+            (this._data.name+'').replace(/\//g, "%2F");
     },
 
     uiMonitorPath: function () {

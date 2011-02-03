@@ -33,7 +33,7 @@ from twisted.internet import defer
 from twisted.python.failure import Failure
 from nox.lib.netinet.netinet import datapathid
 from nox.apps.user_event_log.pyuser_event_log import pyuser_event_log,LogEntry
-from nox.apps.pyrt.pycomponent import CONTINUE
+from nox.apps.pyrt.pycomponent import CONTINUE, PyContext
 from nox.apps.authenticator.pyauth import Host_event
 
 lg = logging.getLogger('directorymanager')
@@ -122,7 +122,8 @@ def demangle_and_deconflict_info(info_obj, dir=""):
         return (dir, info_obj)
 
 def get_default_switch_name(dpid):
-    return "switch " + str(dpid)
+    real_dpid = PyContext.get_real_datapathid(dpid)
+    return "switch " + str(real_dpid)
 
 def get_default_loc_name(switch_name, port_name):
     return "%s:%s" %(switch_name, port_name)

@@ -54,6 +54,7 @@
 #include "threads/cooperative.hh"
 #include "vlog.hh"
 #include "openflow-default.hh"
+#include "nox.hh"
 
 using namespace std;
 using namespace vigil;
@@ -308,6 +309,12 @@ int
 PyContext::switch_update(uint64_t dpid)
 {
     return c->switch_update(datapathid::from_host(dpid));
+}
+
+datapathid
+PyContext::get_real_datapathid(const datapathid& dpid)
+{
+    return vigil::nox::get_real_datapathid(dpid);
 }
 
 int PyContext::send_add_snat(uint64_t dpid, uint16_t port, 

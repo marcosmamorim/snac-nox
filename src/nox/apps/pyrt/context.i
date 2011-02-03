@@ -95,6 +95,7 @@ public:
     int send_switch_command(uint64_t, const std::string, const std::string);
     int switch_reset(uint64_t datapathid);
     int switch_update(uint64_t datapathid);
+    static datapathid get_real_datapathid(const datapathid& datapathid);
 
     int send_add_snat(uint64_t dpid, uint16_t port, 
                     uint32_t ip_addr_start, uint32_t ip_addr_end,

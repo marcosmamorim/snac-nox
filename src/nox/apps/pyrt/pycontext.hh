@@ -134,6 +134,7 @@ public:
     int send_switch_command(uint64_t dpid, const std::string command);
     int switch_reset(uint64_t dpid);
     int switch_update(uint64_t dpid);
+    static datapathid get_real_datapathid(const datapathid& dpid);
 
     void send_stats_request(uint64_t datapath_id, ofp_stats_types type,
             const uint8_t* data, size_t data_size );

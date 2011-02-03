@@ -123,6 +123,7 @@ int fetch_switch_logs(datapathid, const std::string& output_file,
 int send_switch_command(datapathid, const std::string& , const std::vector<std::string> );
 int switch_reset(datapathid);
 int switch_update(datapathid);
+datapathid get_real_datapathid(const datapathid& dpid);
 
 } // namespace vigil::nox
 } // namespace vigil

@@ -55,6 +55,19 @@ static Event_dispatcher event_dispatcher;
 static Timer_dispatcher timer_dispatcher;
 static Switch_Auth *switch_authenticator = NULL; 
 
+// The following map maps the 6 byte hashed datapathid we use to handle
+// 8 byte dpids to the original 8 byte datapathid. We maintain this map
+// so that we can get the original datapathid to use in the UI so we don't
+// display the hashed value to the user.
+typedef std::map<datapathid, datapathid> datapathid_map_type;
+static datapathid_map_type datapathid_map;
+
+datapathid get_real_datapathid(const datapathid& dpid)
+{
+    datapathid_map_type::iterator iter = datapathid_map.find(dpid);
+    return (iter == datapathid_map.end()) ? dpid : iter->second;
+}
+
 class Conn
     : public Pollable {
 public:
@@ -75,6 +88,7 @@ private:
 
     bool do_poll();
 };
+
 typedef std::map<datapathid, Conn*> chashmap;
 static chashmap connection_map;
 
@@ -783,8 +797,9 @@ void Handshake_fsm::recv_message() {
             if (dpid_value > mask)
             {
               dpid_value = fnv_hash_64((const void*)&dpid_value,8) & mask;
-              dpid = datapathid::from_host(dpid_value);
-              features_reply->datapath_id = dpid.as_net();
+              datapathid hashed_dpid = datapathid::from_host(dpid_value);
+              features_reply->datapath_id = hashed_dpid.as_net();
+              datapathid_map.insert(datapathid_map_type::value_type(hashed_dpid, dpid));
             }
             state = CHECK_SWITCH_AUTH; 
           }

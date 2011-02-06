@@ -19,6 +19,7 @@ import logging
 from nox.lib.core import *
 import nox.lib.openflow as openflow
 from nox.lib.packet.packet_utils  import mac_to_str
+from itertools import chain
 
 from nox.lib.netinet.netinet import datapathid
 from nox.apps.switchstats.pycswitchstats import pycswitchstats
@@ -128,22 +129,9 @@ class switchstats(Component):
         # The list 'tables' has multiple table, each dentified
         # by a unique non-null name. Need to cross-reference and
         # overwrite only the appropriate table info.
-
-        i = 0
-        for tabi in tables:
-            j = 0
-            for tabj in self.dp_table_stats[dpid]:
-                if tabi['name'] == tabj['name']:
-                    self.dp_table_stats[dpid][j]=tables[i]
-                    break
-                j+=1
-
-            # The table_stats does not have the table
-            if j == len(self.dp_table_stats[dpid]):
-                if len(tabi['name']) != 0:
-                    # Adding received table to the table_stats for that dpid
-                    self.dp_table_stats[dpid].append(tables[i])
-            i += 1
+        self.dp_table_stats[dpid] = dict(chain(
+                    ((m['name'],m) for m in self.dp_table_stats[dpid]),
+                    ((m['name'],m) for m in tables))).values()
 
     def desc_stats_in_handler(self, dpid, desc):
         self.dp_desc_stats[dpid] = desc

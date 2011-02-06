@@ -138,23 +138,15 @@ class switchstats(Component):
 
     def port_stats_in_handler(self, dpid, ports):
         if dpid not in self.dp_port_stats:
-            new_ports = {}
-            for port in ports:
-                port['delta_bytes'] = 0 
-                new_ports[port['port_no']] = port
-            self.dp_port_stats[dpid] = new_ports 
-            return
-        new_ports = {}
-        for port in ports:    
+            self.dp_port_stats[dpid] = {}
+
+        for port in ports:
             if port['port_no'] in self.dp_port_stats[dpid]:
                 port['delta_bytes'] = port['tx_bytes'] - \
                             self.dp_port_stats[dpid][port['port_no']]['tx_bytes']
-                new_ports[port['port_no']] = port
             else:    
                 port['delta_bytes'] = 0 
-                new_ports[port['port_no']] = port
-        self.dp_port_stats[dpid] = new_ports 
-
+            self.dp_port_stats[dpid][port['port_no']] = port
 
     def port_status_handler(self, dpid, reason, port):
         intdp = int(dpid)

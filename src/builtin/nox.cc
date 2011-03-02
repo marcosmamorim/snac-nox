@@ -28,6 +28,7 @@
 #include "buffer.hh"
 #include "datapath-join.hh"
 #include "datapath-leave.hh"
+#include "switch-features.hh"
 #include "echo-request.hh"
 #include "event-dispatcher.hh"
 #include "flow-mod-event.hh"

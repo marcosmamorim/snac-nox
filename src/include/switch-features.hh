@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with NOX.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef DATAPATH_JOIN_HH
-#define DATAPATH_JOIN_HH 1
+#ifndef SWITCH_FEATURES_HH
+#define SWITCH_FEATURES_HH 1
 
 #include "port.hh"
 #include "event.hh"
@@ -27,18 +27,18 @@
 
 namespace vigil {
 
-struct Datapath_join_event
+struct Switch_features_event
     : public Event,
       public Ofp_msg_event
 {
-    Datapath_join_event(const ofp_switch_features *osf,
+    Switch_features_event(const ofp_switch_features *osf,
                         std::auto_ptr<Buffer> buf);
 
     // -- only for use within python
-    Datapath_join_event() : Event(static_get_name()) { }
+    Switch_features_event() : Event(static_get_name()) { }
 
     static const Event_name static_get_name() {
-        return "Datapath_join_event";
+        return "Switch_features_event";
     }
 
     datapathid datapath_id;
@@ -49,12 +49,12 @@ struct Datapath_join_event
 
     std::vector<Port> ports;
 
-    Datapath_join_event(const Datapath_join_event&);
-    Datapath_join_event& operator=(const Datapath_join_event&);
+    Switch_features_event(const Switch_features_event&);
+    Switch_features_event& operator=(const Switch_features_event&);
 };
 
 inline
-Datapath_join_event::Datapath_join_event(const ofp_switch_features *osf,
+Switch_features_event::Switch_features_event(const ofp_switch_features *osf,
                                          std::auto_ptr<Buffer> buf)
     : Event(static_get_name()), Ofp_msg_event(&osf->header, buf)
 {
@@ -75,4 +75,4 @@ Datapath_join_event::Datapath_join_event(const ofp_switch_features *osf,
     
 } // namespace vigil
 
-#endif /* datapath-join.hh */
+#endif /* switch-features.hh */

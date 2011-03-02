@@ -14,6 +14,7 @@ cnode.hh					\
 command-line.hh					\
 datapath-join.hh				\
 datapath-leave.hh				\
+switch-features.hh              \
 datapath.hh					\
 desc-stats-in.hh				\
 echo-request.hh					\

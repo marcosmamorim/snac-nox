@@ -142,6 +142,29 @@ def gen_dp_join_cb(handler):
     f.cb = handler
     return f
 
+def gen_sw_features_cb(handler):
+    def f(event):
+        attrs = {}
+        attrs[core.N_BUFFERS] = event.n_buffers
+        attrs[core.N_TABLES] = event.n_tables
+        attrs[core.CAPABILITES] = event.capabilities
+        attrs[core.ACTIONS] = event.actions
+        attrs[core.PORTS] = event.ports
+        for i in range(0, len(attrs[core.PORTS])):
+            port = attrs[core.PORTS][i]
+            config = port['config']
+            state = port['state']
+            attrs[core.PORTS][i]['link']    = (state & openflow.OFPPS_LINK_DOWN) == 0
+            attrs[core.PORTS][i]['enabled'] = (config & openflow.OFPPC_PORT_DOWN) == 0
+            attrs[core.PORTS][i]['flood']   = (config & openflow.OFPPC_NO_FLOOD)  == 0
+
+        ret = f.cb(event.datapath_id, attrs)
+        if ret == None:
+            return CONTINUE
+        return ret
+    f.cb = handler
+    return f
+
 def gen_dp_leave_cb(handler):
     def f(event):
         ret = f.cb(event.datapath_id)

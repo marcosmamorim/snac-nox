@@ -23,6 +23,7 @@
 #include "bootstrap-complete.hh"
 #include "datapath-join.hh"
 #include "datapath-leave.hh"
+#include "switch-features.hh"
 #include "echo-request.hh"
 #include "flow-removed.hh"
 #include "flow-mod-event.hh"

@@ -34,6 +34,7 @@
 
 #include "datapath-join.hh"
 #include "datapath-leave.hh"
+#include "switch-features.hh"
 #include "bootstrap-complete.hh"
 #include "aggregate-stats-in.hh"
 #include "desc-stats-in.hh"

@@ -427,6 +427,10 @@ class Component:
         self.register_handler(Datapath_join_event.static_get_name(),
                               gen_dp_join_cb(handler))
 
+    def register_for_datapath_join(self, handler):
+        self.register_handler(Switch_features_event.static_get_name(),
+                              gen_sw_features_cb(handler))
+
     ################################################################################
     # register a handler to be called whenever table statistics are
     # returned by a switch.

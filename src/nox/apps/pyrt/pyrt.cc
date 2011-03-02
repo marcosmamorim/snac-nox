@@ -30,6 +30,7 @@
 
 #include "datapath-join.hh"
 #include "datapath-leave.hh"
+#include "switch-features.hh"
 #include "bootstrap-complete.hh"
 #include "aggregate-stats-in.hh"
 #include "desc-stats-in.hh"
@@ -171,6 +172,20 @@ const string pretty_print_python_exception() {
 static void convert_datapath_join(const Event& e, PyObject* proxy) {
     const Datapath_join_event& sfe 
                 = dynamic_cast<const Datapath_join_event&>(e);
+
+    pyglue_setattr_string(proxy, "datapath_id", to_python(sfe.datapath_id));
+    pyglue_setattr_string(proxy, "n_tables",    to_python(sfe.n_tables));
+    pyglue_setattr_string(proxy, "n_buffers",  to_python(sfe.n_buffers));
+    pyglue_setattr_string(proxy, "capabilities", to_python(sfe.capabilities));
+    pyglue_setattr_string(proxy, "actions",    to_python(sfe.actions));
+    pyglue_setattr_string(proxy, "ports", to_python<vector<Port> >(sfe.ports));
+
+    ((Event*)SWIG_Python_GetSwigThis(proxy)->ptr)->operator=(e);
+}
+
+static void convert_switch_features(const Event& e, PyObject* proxy) {
+    const Switch_features_event& sfe 
+                = dynamic_cast<const Switch_features_event&>(e);
 
     pyglue_setattr_string(proxy, "datapath_id", to_python(sfe.datapath_id));
     pyglue_setattr_string(proxy, "n_tables",    to_python(sfe.n_tables));
@@ -397,6 +412,8 @@ PyRt::PyRt(const Context* c,
                              &convert_datapath_join);
     register_event_converter(Datapath_leave_event::static_get_name(), 
                              &convert_datapath_leave);
+    register_event_converter(Switch_features_event::static_get_name(), 
+                             &convert_switch_features);
     register_event_converter(Flow_removed_event::static_get_name(), 
                              &convert_flow_removed);
     register_event_converter(Flow_mod_event::static_get_name(), 

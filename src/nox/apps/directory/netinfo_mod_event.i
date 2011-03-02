@@ -19,6 +19,7 @@
 #include "bootstrap-complete.hh"
 #include "datapath-join.hh"
 #include "datapath-leave.hh"
+#include "switch-features.hh"
 #include "flow-removed.hh"
 #include "flow-mod-event.hh"
 #include "netinfo_mod_event.hh"

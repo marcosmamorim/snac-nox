@@ -19,6 +19,7 @@
 
 #include "datapath-join.hh"
 #include "datapath-leave.hh"
+#include "switch-features.hh"
 #include "error-event.hh"
 #include "bootstrap-complete.hh"
 #include "flow-removed.hh"
@@ -87,6 +88,7 @@ EventDispatcherComponent::EventDispatcherComponent(const Context* c,
     // Register the system events
     register_event<Datapath_join_event>();
     register_event<Datapath_leave_event>();
+    register_event<Switch_features_event>();
     register_event<Error_event>();
     register_event<Flow_removed_event>();
     register_event<Flow_mod_event>();

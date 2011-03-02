@@ -33,6 +33,7 @@
 #include "packet-in.hh"
 #include "port-status.hh"
 #include "datapath-join.hh"
+#include "switch-features.hh"
 #include "echo-request.hh"
 #include "flow-stats-in.hh"
 #include "aggregate-stats-in.hh"
@@ -83,11 +84,11 @@ handle_port_status(datapathid datapath_id,
 
 Event*
 handle_features_reply(datapathid datapath_id,
-                  const ofp_switch_features *osf, std::auto_ptr<Buffer>)
+                  const ofp_switch_features *osf, std::auto_ptr<Buffer> buf)
 {
-    lg.err("ignoring additional features reply event from %s", 
+    lg.err("received updated features reply event from %s", 
             datapath_id.string().c_str());
-    return NULL;
+    return new Switch_features_event(osf, buf);
 }
 
 Event*

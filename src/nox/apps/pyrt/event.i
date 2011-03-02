@@ -75,6 +75,15 @@ private:
     Datapath_leave_event();
 };
 
+struct Switch_features_event
+    : public Event
+{
+    static const std::string static_get_name();
+
+private:
+    Switch_features_event();
+};
+
 struct Flow_removed_event
     : public Event
 {

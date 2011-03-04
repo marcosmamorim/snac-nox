@@ -29,6 +29,7 @@
 #include "port-stats-in.hh"
 #include "table-stats-in.hh"
 #include "port-status.hh"
+#include "switch-features.hh"
 #include "pyrt/pycontext.hh"
 #include "pyrt/pyevent.hh"
 #include "pyrt/pyglue.hh"

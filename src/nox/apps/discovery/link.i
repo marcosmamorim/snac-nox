@@ -28,6 +28,7 @@
 #include "port-stats-in.hh"
 #include "packet-in.hh"
 #include "port-status.hh"
+#include "switch-features.hh"
 #include "echo-request.hh"
 #include "pyrt/pycontext.hh"
 #include "pyrt/pyevent.hh"

@@ -65,6 +65,8 @@ struct ethernet
     static const uint16_t LLDP   = htons_<0x88cc>::val;
 
     static const uint64_t STP_MULTICAST = 0x0180c2000000LL;
+    static const uint64_t CDP_MULTICAST = 0x01000cccccccLL;
+    static const uint64_t CISCO_STP_MULTICAST = 0x01000ccccccdLL;
 
     /* Values below this cutoff are 802.3 packets and the two bytes
      * following MAC addresses are used as a frame length.  Otherwise, the

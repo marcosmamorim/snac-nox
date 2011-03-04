@@ -618,14 +618,18 @@ Authenticator::handle_packet_in(const Event& e)
 {
     const Packet_in_event& pi = assert_cast<const Packet_in_event&>(e);
     uint64_t dpint = pi.datapath_id.as_host();
+    uint64_t dl_dst;
 
     Flow flow(htons(pi.in_port), *(pi.buf));
-    if (flow.dl_type == ethernet::LLDP) {
+    dl_dst = flow.dl_dst.hb_long();
+
+    if ((flow.dl_type == ethernet::LLDP) ||
+        (dl_dst == ethernet::CDP_MULTICAST)) {
         return CONTINUE;
     }
     /* If STP is enabled in the native switch, do not forward BPDUs 
      */
-    if ((flow.dl_dst.hb_long() == ethernet::STP_MULTICAST) &&
+    if (((dl_dst & 0xFFFFFFFFFFF0LL) == ethernet::STP_MULTICAST) &&
             (switch_capabilities_map[dpint] & OFPC_STP)) {
         return CONTINUE;
     }

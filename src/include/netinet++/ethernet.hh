@@ -64,6 +64,8 @@ struct ethernet
     static const uint16_t IPV6   = htons_<0x86dd>::val; 
     static const uint16_t LLDP   = htons_<0x88cc>::val;
 
+    static const uint64_t STP_MULTICAST = 0x0180c2000000LL;
+
     /* Values below this cutoff are 802.3 packets and the two bytes
      * following MAC addresses are used as a frame length.  Otherwise, the
      * two bytes are used as the Ethernet type.

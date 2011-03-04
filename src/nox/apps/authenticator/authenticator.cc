@@ -26,6 +26,7 @@
 #include "bindings_storage/bindings_storage.hh"
 #include "bootstrap-complete.hh"
 #include "datapath-join.hh"
+#include "switch-features.hh"
 #include "datapath-leave.hh"
 #include "directory/group_change_event.hh"
 #include "directory/group_event.hh"
@@ -139,6 +140,8 @@ Authenticator::configure(const Configuration*)
         (boost::bind(&Authenticator::handle_datapath_join, this, _1));
     register_handler<Datapath_leave_event>
         (boost::bind(&Authenticator::handle_data_leave, this, _1));
+    register_handler<Switch_features_event>
+        (boost::bind(&Authenticator::handle_switch_features, this, _1));
     register_handler<Port_status_event>
         (boost::bind(&Authenticator::handle_port_status, this, _1));
     register_handler<Link_event>
@@ -614,9 +617,16 @@ Disposition
 Authenticator::handle_packet_in(const Event& e)
 {
     const Packet_in_event& pi = assert_cast<const Packet_in_event&>(e);
+    uint64_t dpint = pi.datapath_id.as_host();
 
     Flow flow(htons(pi.in_port), *(pi.buf));
     if (flow.dl_type == ethernet::LLDP) {
+        return CONTINUE;
+    }
+    /* If STP is enabled in the native switch, do not forward BPDUs 
+     */
+    if ((flow.dl_dst.hb_long() == ethernet::STP_MULTICAST) &&
+            (switch_capabilities_map[dpint] & OFPC_STP)) {
         return CONTINUE;
     }
 
@@ -1144,6 +1154,8 @@ Authenticator::handle_datapath_join(const Event& e)
     hash_set<uint64_t> points;
 
     new_switch(dj.datapath_id);
+    switch_capabilities_map[dpint] = dj.capabilities;
+
     for (std::vector<Port>::const_iterator iter = dj.ports.begin();
          iter != dj.ports.end(); ++iter)
     {
@@ -1167,10 +1179,21 @@ Authenticator::handle_data_leave(const Event& e)
     const Datapath_leave_event& dl = assert_cast<const Datapath_leave_event&>(e);
     hash_set<uint64_t> empty_points;
     uint64_t dpint = dl.datapath_id.as_host();
+    switch_capabilities_map.erase(dpint);
 
     remove_dp_hosts(dpint, empty_points, true, false, " (datapath leave)");
     remove_dp_locations(dl.datapath_id, dpint, empty_points, true);
     remove_switch(dl.datapath_id);
+
+    return CONTINUE;
+}
+
+Disposition
+Authenticator::handle_switch_features(const Event& e)
+{
+    const Switch_features_event& sf = assert_cast<const Switch_features_event&>(e);
+    uint64_t dpint = sf.datapath_id.as_host();
+    switch_capabilities_map[dpint] = sf.capabilities;
 
     return CONTINUE;
 }

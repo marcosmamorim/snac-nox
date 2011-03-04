@@ -291,6 +291,8 @@ private:
         uint32_t mask;
     };
 
+    hash_map<uint64_t, uint32_t> switch_capabilities_map;
+
     std::vector<ip_subnet> internal_subnets;
 
     typedef hash_map<uint64_t, GroupInfo> GroupInfoMap;
@@ -376,6 +378,7 @@ private:
 
     Disposition handle_datapath_join(const Event&);
     Disposition handle_data_leave(const Event&);
+    Disposition handle_switch_features(const Event&);
     Disposition handle_port_status(const Event&);
     Disposition handle_link_change(const Event&);
 

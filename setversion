@@ -1,3 +1,0 @@
-#!/bin/bash
-sed -i "s/^AC_INIT(.*/AC_INIT(nox,$1)/" configure.ac src/nox/ext/configure.ac
-echo -e "nox ($1) unstable; urgency=low\n\n  * Automatic build.\n\n -- SNAC <snac@openflowhub.org>  $(date -R)" >debian/changelog
